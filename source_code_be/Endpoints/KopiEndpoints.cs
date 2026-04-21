@@ -45,5 +45,40 @@ public static class KopiEndpoints
             await db.SaveChangesAsync();
             return Results.Ok(kopiBaru);
         });
+
+        /// PUT Kopi by ID
+        app.MapPut("/kopi/{id}", async (KopiDb db, int id, UpdateKopiDTO request) =>
+        {
+            var kopi = await db.Kopis.FindAsync(id);
+            if (kopi is null) return Results.NotFound();
+
+            if (string.IsNullOrWhiteSpace(request.Name))
+            {
+                return Results.BadRequest("Nama kopi tidak boleh kosong!");
+            }
+
+            if (request.Price < 0)
+            {
+                return Results.BadRequest("Harga kopi tidak boleh minus!");
+            }
+
+            kopi.Name = request.Name;
+            kopi.Price = request.Price;
+
+            await db.SaveChangesAsync();
+
+            return Results.NoContent();
+        });
+
+        app.MapDelete("/kopi/{id}", async (KopiDb db, int id) =>
+        {
+            var kopi = await db.Kopis.FindAsync(id);
+            if (kopi is null) return Results.NotFound();
+
+            db.Kopis.Remove(kopi);
+            await db.SaveChangesAsync();
+
+            return Results.Ok(kopi);
+        });
     }
 }
