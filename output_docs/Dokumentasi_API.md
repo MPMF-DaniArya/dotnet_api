@@ -116,3 +116,76 @@ public class Kopi
     public int Price { get; set; }
 }
 ```
+
+
+---
+### 🆕 Update: Tue Apr 21 10:24:54 UTC 2026
+Berikut adalah dokumentasi teknis untuk pembaharuan API pada `KopiEndpoints.cs` berdasarkan Git Diff yang diberikan.
+
+# Dokumentasi API: Endpoint Kopi (Update Terbaru)
+
+Dokumentasi ini mencakup penambahan fitur **Update** dan **Delete** pada modul Kopi.
+
+---
+
+## 1. Update Kopi
+Memperbarui data kopi yang sudah ada berdasarkan ID yang diberikan.
+
+*   **URL:** `/kopi/{id}`
+*   **Method:** `PUT`
+*   **Content-Type:** `application/json`
+
+### Business Logic
+1.  Sistem mencari data kopi berdasarkan `id`.
+2.  Jika `id` tidak ditemukan, kembalikan status `404 Not Found`.
+3.  **Validasi Nama:** Field `Name` tidak boleh kosong atau hanya berisi spasi. Jika melanggar, kembalikan `400 Bad Request`.
+4.  **Validasi Harga:** Field `Price` tidak boleh bernilai negatif (< 0). Jika melanggar, kembalikan `400 Bad Request`.
+5.  Jika validasi lolos, sistem memperbarui data dan menyimpan perubahan ke database.
+
+### Request Body
+```json
+{
+  "name": "Kopi Susu Gula Aren",
+  "price": 25000
+}
+```
+
+### Response
+*   **Success (204 No Content):** Data berhasil diperbarui.
+*   **Error (400 Bad Request):**
+    ```json
+    "Nama kopi tidak boleh kosong!"
+    // ATAU
+    "Harga kopi tidak boleh minus!"
+    ```
+*   **Error (404 Not Found):** ID tidak ditemukan dalam database.
+
+---
+
+## 2. Delete Kopi
+Menghapus data kopi dari database secara permanen berdasarkan ID.
+
+*   **URL:** `/kopi/{id}`
+*   **Method:** `DELETE`
+
+### Business Logic
+1.  Sistem mencari data kopi berdasarkan `id`.
+2.  Jika data tidak ditemukan, kembalikan status `404 Not Found`.
+3.  Jika ditemukan, hapus data tersebut dari database dan simpan perubahan.
+
+### Response
+*   **Success (200 OK):** Mengembalikan objek kopi yang baru saja dihapus.
+    ```json
+    {
+      "id": 5,
+      "name": "Kopi Hitam Luwak",
+      "price": 50000
+    }
+    ```
+*   **Error (404 Not Found):** ID tidak ditemukan dalam database.
+
+---
+
+### Catatan untuk Developer
+- Pastikan menyertakan `id` pada path URL untuk kedua endpoint di atas.
+- Untuk endpoint `PUT`, semua field dalam `UpdateKopiDTO` wajib divalidasi di sisi Client sebelum dikirim ke server untuk mengurangi beban request ilegal.
