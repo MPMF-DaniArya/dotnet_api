@@ -1,0 +1,49 @@
+name: Auto Update API Docs
+
+on:
+  push:
+    branches:
+      - main  # Ganti ke 'master' atau 'develop' sesuai branch tim kamu
+    paths:
+      - '**.cs' # Automatisasi hanya jalan jika ada perubahan file C#
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 2 # Penting: Agar Git bisa membandingkan commit sekarang vs sebelumnya
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.14'
+
+      - name: Install dependencies
+        run: pip install google-genai
+
+      - name: Run AI Doc Generator
+        env:
+          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }} # API Key yang kamu simpan di GitHub Settings
+        run: python doc_generator.py
+
+      - name: Commit and Push changes
+        run: |
+          git config --global user.name "Documentation Bot"
+          git config --global user.email "bot@github.com"
+          
+          # Cek apakah folder output_docs ada, jika tidak buat dulu agar tidak error
+          mkdir -p output_docs
+          
+          # Gunakan git add . agar lebih aman mencakup folder baru
+          git add output_docs/
+          
+          # Cek apakah ada perubahan yang perlu di-commit
+          if git diff --staged --quiet; then
+            echo "Tidak ada perubahan dokumentasi."
+          else
+            git commit -m "docs: auto update documentation for new services"
+            git push
+          fi

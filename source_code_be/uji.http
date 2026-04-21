@@ -1,0 +1,26 @@
+### Add Kopi
+POST http://localhost:5117/kopi
+Content-Type: application/json
+
+{
+    "Name": "Yakult",
+    "Price": 10000,
+}
+
+### Get all Kopi
+GET http://localhost:5117/kopi
+
+### Get Kopi by Id
+GET http://localhost:5117/kopi/3
+
+### Update Kopi
+PUT http://localhost:5117/kopi/6
+Content-Type: application/json
+
+{
+    "Name": "Matcha Latte",
+    "Price": 18000
+}
+
+### Delete Kopi
+DELETE  http://localhost:5117/kopi/7
